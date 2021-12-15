@@ -128,7 +128,7 @@ void handleBinload(String pload)
   else
   {
      delay(1000);
-     File dataFile = SPIFFS.open(pload + ".bin", "r");
+     File dataFile = SPIFFS.open(pload, "r");
      if (dataFile) {
        client.println("POST / HTTP/1.1");
        client.println("Accept: */*");
