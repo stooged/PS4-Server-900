@@ -124,18 +124,29 @@ void handleBinload(String pload)
   if (!client.connect(webServer.client().remoteIP(), 9090)) {
     delay(1000);
     scode = 400;
+    if (!client.connect(webServer.client().remoteIP(), 9020)) {
+      delay(1000);
+    scode = 400;
+    }
+    else
+    {
+     delay(1000);
+     File dataFile = SPIFFS.open(pload, "r");
+     if (dataFile) {
+       while (dataFile.available()) {
+         client.write(dataFile.read());
+       }
+    dataFile.close(); 
+    }
+    client.stop();
+    scode = 200;
+    }
   }
   else
   {
      delay(1000);
      File dataFile = SPIFFS.open(pload, "r");
      if (dataFile) {
-       client.println("POST / HTTP/1.1");
-       client.println("Accept: */*");
-       client.println("Content-Type: application/octet-stream");
-       client.print("Content-Length: ");
-       client.println(dataFile.size());
-       client.println();
        while (dataFile.available()) {
          client.write(dataFile.read());
        }
