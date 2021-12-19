@@ -4,7 +4,7 @@ This is a project designed for the <a href=https://www.wemos.cc/en/latest/d1/d1_
 
 
 
-this is for the 9.00 exploit and the esp8266 device will handle sending the payloads to the binloader server in goldhen, the exploit has the mod by leeful to load goldhen automatically.
+this is for the 9.00 exploit and the esp8266, the payloads are all single file format (.html) generated with <a href=https://github.com/stooged/bin2html-900>bin2html 900</a> which removes the need for binloader.
 
 the firmware is updatable via http and the exploit files can be managed via http.
 
