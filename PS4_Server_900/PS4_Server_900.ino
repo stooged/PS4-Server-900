@@ -162,7 +162,7 @@ void handleBinload(String pload)
 
 
 bool loadFromSdCard(String path) {
-//Serial.println(path);
+Serial.println(path);
  if (path.equals("/connecttest.txt"))
  {
   webServer.setContentLength(22);
@@ -228,7 +228,7 @@ bool loadFromSdCard(String path) {
   }
   
   if (webServer.streamFile(dataFile, dataType) != dataFile.size()) {
-    //Serial.println("Sent less data than expected!");
+    Serial.println("Sent less data than expected!");
   }
   dataFile.close();
   return true;
@@ -251,7 +251,7 @@ void handleNotFound() {
     message += " NAME:" + webServer.argName(i) + "\n VALUE:" + webServer.arg(i) + "\n";
   }
   webServer.send(404, "text/plain", "Not Found");
-  //Serial.print(message);
+  Serial.print(message);
 }
 
 void handleFileUpload() {
@@ -315,7 +315,7 @@ void updateFw()
 {
   if (SPIFFS.exists("/fwupdate.bin")) {
   File updateFile;
-  //Serial.println("Update file found");
+  Serial.println("Update file found");
   updateFile = SPIFFS.open("/fwupdate.bin", "r");
  if (updateFile) {
   size_t updateSize = updateFile.size();
@@ -324,7 +324,7 @@ void updateFw()
     md5.addStream(updateFile,updateSize);
     md5.calculate();
     String md5Hash = md5.toString();
-    //Serial.println("Update file hash: " + md5Hash);
+    Serial.println("Update file hash: " + md5Hash);
     updateFile.close();
     updateFile = SPIFFS.open("/fwupdate.bin", "r");
   if (updateFile) {
@@ -342,7 +342,7 @@ void updateFw()
     char md5Buf[md5BufSize];
     md5Hash.toCharArray(md5Buf, md5BufSize) ;
     Update.setMD5(md5Buf);
-    //Serial.println("Updating firmware...");
+    Serial.println("Updating firmware...");
    long bsent = 0;
    int cprog = 0;
     while (updateFile.available()) {
@@ -353,15 +353,15 @@ void updateFw()
       int progr = ((double)bsent /  updateSize)*100;
       if (progr >= cprog) {
         cprog = progr + 10;
-      //Serial.println(String(progr) + "%");
+      Serial.println(String(progr) + "%");
       }
     }
     updateFile.close(); 
   if (Update.end(true))
   {
   digitalWrite(BUILTIN_LED, HIGH);
-  //Serial.println("Installed firmware hash: " + Update.md5String()); 
-  //Serial.println("Update complete");
+  Serial.println("Installed firmware hash: " + Update.md5String()); 
+  Serial.println("Update complete");
   SPIFFS.remove("/fwupdate.bin");
   sendwebmsg("Uploaded file hash: " + md5Hash + "<br>Installed firmware hash: " + Update.md5String() + "<br><br>Update complete, Rebooting.");
   delay(1000);
@@ -370,14 +370,14 @@ void updateFw()
   else
   {
     digitalWrite(BUILTIN_LED, HIGH);
-    //Serial.println("Update failed");
+    Serial.println("Update failed");
     sendwebmsg("Update failed");
      //Update.printError(Serial);
     }
   }
   }
   else {
-  //Serial.println("Error, file is invalid");
+  Serial.println("Error, file is invalid");
   updateFile.close(); 
   digitalWrite(BUILTIN_LED, HIGH);
   SPIFFS.remove("/fwupdate.bin");
@@ -388,7 +388,7 @@ void updateFw()
   }
   else
   {
-    //Serial.println("No update file found");
+    Serial.println("No update file found");
     sendwebmsg("No update file found");
   }
 }
@@ -396,7 +396,7 @@ void updateFw()
 
 void handleFormat()
 {
-  //Serial.print("Formatting SPIFFS");
+  Serial.print("Formatting SPIFFS");
   SPIFFS.end();
   SPIFFS.format();
   SPIFFS.begin();
@@ -508,7 +508,7 @@ void handleConfig()
 
 void handleReboot()
 {
-  //Serial.print("Rebooting ESP");
+  Serial.print("Rebooting ESP");
   String htmStr = "<!DOCTYPE html><html><head><meta http-equiv=\"refresh\" content=\"8; url=/info.html\"><style type=\"text/css\">#loader {  z-index: 1;   width: 50px;   height: 50px;   margin: 0 0 0 0;   border: 6px solid #f3f3f3;   border-radius: 50%;   border-top: 6px solid #3498db;   width: 50px;   height: 50px;   -webkit-animation: spin 2s linear infinite;   animation: spin 2s linear infinite; } @-webkit-keyframes spin {  0%  {  -webkit-transform: rotate(0deg);  }  100% {  -webkit-transform: rotate(360deg); }}@keyframes spin {  0% { transform: rotate(0deg); }  100% { transform: rotate(360deg); }} body { background-color: #1451AE; color: #ffffff; font-size: 20px; font-weight: bold; margin: 0 0 0 0.0; padding: 0.4em 0.4em 0.4em 0.6em;}   #msgfmt { font-size: 16px; font-weight: normal;}#status { font-size: 16px;  font-weight: normal;}</style></head><center><br><br><br><br><br><p id=\"status\"><div id='loader'></div><br>Rebooting</p></center></html>";
   webServer.setContentLength(htmStr.length());
   webServer.send(200, "text/html", htmStr);
@@ -653,9 +653,9 @@ void writeConfig()
 
 void setup(void) 
 {
-  //Serial.begin(115200);
-  //Serial.setDebugOutput(true);
-  //Serial.println("Version: " + firmwareVer);
+  Serial.begin(115200);
+  Serial.setDebugOutput(true);
+  Serial.println("Version: " + firmwareVer);
   if (SPIFFS.begin()) {
   if (SPIFFS.exists("/config.ini")) {
   File iniFile = SPIFFS.open("/config.ini", "r");
@@ -708,27 +708,27 @@ void setup(void)
   }
   else
   {
-    //Serial.println("No SPIFFS");
+    Serial.println("No SPIFFS");
   }
 
-  //Serial.println("SSID: " + AP_SSID);
-  //Serial.println("Password: " + AP_PASS);
-  //Serial.print("\n");
-  //Serial.println("WEB Server IP: " + Server_IP.toString());
-  //Serial.println("Subnet: " + Subnet_Mask.toString());
-  //Serial.println("WEB Server Port: " + String(WEB_PORT));
-  //Serial.println("DNS Server IP: " + Server_IP.toString());
-  //Serial.print("\n\n");
+  Serial.println("SSID: " + AP_SSID);
+  Serial.println("Password: " + AP_PASS);
+  Serial.print("\n");
+  Serial.println("WEB Server IP: " + Server_IP.toString());
+  Serial.println("Subnet: " + Subnet_Mask.toString());
+  Serial.println("WEB Server Port: " + String(WEB_PORT));
+  Serial.println("DNS Server IP: " + Server_IP.toString());
+  Serial.print("\n\n");
 
   WiFi.mode(WIFI_AP);
   WiFi.softAPConfig(Server_IP, Server_IP, Subnet_Mask);
   WiFi.softAP(AP_SSID.c_str(), AP_PASS.c_str());
-  //Serial.println("WIFI AP started");
+  Serial.println("WIFI AP started");
 
   dnsServer.setTTL(30);
   dnsServer.setErrorReplyCode(DNSReplyCode::ServerFailure);
   dnsServer.start(53, "*", Server_IP);
-  //Serial.println("DNS server started");
+  Serial.println("DNS server started");
 
   webServer.onNotFound(handleNotFound);
   webServer.on("/update.html", HTTP_POST, []() {} ,handleFwUpdate);
@@ -749,7 +749,7 @@ void setup(void)
   webServer.on("/reboot.html", HTTP_GET, handleRebootHtml);
   webServer.on("/reboot.html", HTTP_POST, handleReboot);
   webServer.begin(WEB_PORT);
-  //Serial.println("HTTP server started");
+  Serial.println("HTTP server started");
 }
 
 
