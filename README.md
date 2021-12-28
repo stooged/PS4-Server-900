@@ -4,7 +4,7 @@ This is a project designed for the <a href=https://www.wemos.cc/en/latest/d1/d1_
 
 
 
-this is for the 9.00 exploit and the esp8266, the payloads are all single file format (.html) generated with <a href=https://github.com/stooged/bin2html-900>bin2html 900</a> which removes the need for binloader.
+this is for the 9.00 exploit and the esp8266.
 
 the exploit files and payloads will be cached on first load which will allow full offline operation, you will still need to plug in the usb drive manually but the ESP8266 will not be required in offline mode.
 
