@@ -2,6 +2,7 @@
 #include <ESP8266WebServer.h>
 #include <DNSServer.h>
 #include <FS.h>
+#include "Loader.h"
 
 ADC_MODE(ADC_VCC);
 MD5Builder md5;
@@ -67,43 +68,38 @@ String formatBytes(size_t bytes){
 }
 
 
-String urldecode(String str)
+String urlencode(String str)
 {
     String encodedString="";
     char c;
     char code0;
     char code1;
+    char code2;
     for (int i =0; i < str.length(); i++){
-        c=str.charAt(i);
-      if (c == '+'){
-        encodedString+=' ';  
-      }else if (c == '%') {
-        i++;
-        code0=str.charAt(i);
-        i++;
-        code1=str.charAt(i);
-        c = (h2int(code0) << 4) | h2int(code1);
+      c=str.charAt(i);
+      if (c == ' '){
+        encodedString+= '+';
+      } else if (isalnum(c)){
         encodedString+=c;
       } else{
-        encodedString+=c;  
+        code1=(c & 0xf)+'0';
+        if ((c & 0xf) >9){
+            code1=(c & 0xf) - 10 + 'A';
+        }
+        c=(c>>4)&0xf;
+        code0=c+'0';
+        if (c > 9){
+            code0=c - 10 + 'A';
+        }
+        code2='\0';
+        encodedString+='%';
+        encodedString+=code0;
+        encodedString+=code1;
       }
       yield();
     }
-   return encodedString;
-}
-
-unsigned char h2int(char c)
-{
-    if (c >= '0' && c <='9'){
-        return((unsigned char)c - '0');
-    }
-    if (c >= 'a' && c <='f'){
-        return((unsigned char)c - 'a' + 10);
-    }
-    if (c >= 'A' && c <='F'){
-        return((unsigned char)c - 'A' + 10);
-    }
-    return(0);
+    encodedString.replace("%2E",".");
+    return encodedString;
 }
 
 
@@ -211,7 +207,7 @@ void handleBinload(String pload)
 
 
 bool loadFromSdCard(String path) {
- path = urldecode(path);
+ path = webServer.urlDecode(path);
  //Serial.println(path);
  if (path.equals("/connecttest.txt"))
  {
@@ -248,7 +244,19 @@ bool loadFromSdCard(String path) {
     handleBinload(path);
     return true;
   }
-  
+
+  if (path.endsWith("payloads.html"))
+  {
+    handlePayloads();
+    return true;
+  }
+
+  if (path.endsWith("loader.html"))
+  {
+    handleLoader();
+    return true;
+  }
+
   String dataType = getContentType(path);
 
   File dataFile;
@@ -521,7 +529,7 @@ void handlePayloads() {
       payloadCount++;
       String fnamev = fname;
       fnamev.replace(".bin","");
-      output +=  "<a onclick=\"setpayload('/" + fname + "','" + fnamev + "')\"><button class=\"btn\">" + fnamev + "</button></a>&nbsp;";
+      output +=  "<a onclick=\"setpayload('" + urlencode(fname) + "','" + fnamev + "')\"><button class=\"btn\">" + fnamev + "</button></a>&nbsp;";
       cntr++;
       if (cntr == 3)
       {
@@ -539,6 +547,12 @@ void handlePayloads() {
   output += "</center></body></html>";
   webServer.setContentLength(output.length());
   webServer.send(200, "text/html", output);
+}
+
+
+void handleLoader()
+{
+  webServer.send(200, "text/html", loaderData);
 }
 
 
@@ -669,10 +683,11 @@ void handleCacheManifest() {
       if (fname.endsWith(".gz")) {
         fname = fname.substring(0, fname.length() - 3);
       }
-     output += fname + "\r\n";
+     output += urlencode(fname) + "\r\n";
     }
     entry.close();
   }
+  output += "loader.html\r\npayloads.html\r\n";
   webServer.setContentLength(output.length());
   webServer.send(200, "text/cache-manifest", output);
 }
@@ -902,7 +917,6 @@ void setup(void)
   webServer.on("/admin.html", HTTP_GET, handleAdminHtml);
   webServer.on("/reboot.html", HTTP_GET, handleRebootHtml);
   webServer.on("/reboot.html", HTTP_POST, handleReboot);
-  webServer.on("/payloads.html", HTTP_GET, handlePayloads);
   webServer.begin(WEB_PORT);
   //Serial.println("HTTP server started");
 }
