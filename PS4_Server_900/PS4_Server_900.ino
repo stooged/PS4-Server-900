@@ -3,6 +3,7 @@
 #include <DNSServer.h>
 #include <FS.h>
 #include "Loader.h"
+#include "Pages.h"
 
 ADC_MODE(ADC_VCC);
 MD5Builder md5;
@@ -245,18 +246,6 @@ bool loadFromSdCard(String path) {
     return true;
   }
 
-  if (path.endsWith("payloads.html"))
-  {
-    handlePayloads();
-    return true;
-  }
-
-  if (path.endsWith("loader.html"))
-  {
-    handleLoader();
-    return true;
-  }
-
   String dataType = getContentType(path);
 
   File dataFile;
@@ -266,11 +255,27 @@ bool loadFromSdCard(String path) {
   }
   
   if (!dataFile) {
+
      if (path.endsWith("index.html") || path.endsWith("index.htm"))
      {
-       handleNoSketchData();
-       return true;
-      }
+        webServer.send(200, "text/html", indexData);
+        return true;
+     }
+     if (path.endsWith("menu.html"))
+     {
+        webServer.send(200, "text/html", menuData);
+        return true;
+     }
+     if (path.endsWith("payloads.html"))
+     {
+        handlePayloads();
+        return true;
+     }
+     if (path.endsWith("loader.html"))
+     {
+        webServer.send(200, "text/html", loaderData);
+        return true;
+     }
     return false;
   }
   if (webServer.hasArg("download")) {
@@ -502,15 +507,6 @@ void handleFileMan() {
 }
 
 
-void handleNoSketchData() {
-  String image = "";
-  String output = "<!DOCTYPE html><html><head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>PS4 Server</title><style>.btn {background-color: DodgerBlue; border: none; color: white; padding: 12px 16px; font-size: 16px; cursor: pointer; font-weight: bold;}.btn:hover {background-color: RoyalBlue;}body {background-color: #1451AE; color: #ffffff; text-shadow: 3px 2px DodgerBlue;)</style></head><body><center><h1>Sketch data or index.html missing</h1>";
-  output += "You need to upload the exploit files to the ESP8266 board.<br>in the arduino ide select <b>Tools</b> &gt; <b>ESP8266 Sketch Data Upload</b></center></body></html>";
-  webServer.setContentLength(output.length());
-  webServer.send(200, "text/html", output);
-}
-
-
 void handlePayloads() {
   Dir dir = SPIFFS.openDir("/");
   String output = "<!DOCTYPE html><html><head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>ESP Server</title><script>function setpayload(payload,title){ sessionStorage.setItem('payload', payload); sessionStorage.setItem('title', title); window.open('loader.html', '_self');}</script><style>.btn { background-color: DodgerBlue; border: none; color: white; padding: 12px 16px; font-size: 16px; cursor: pointer; font-weight: bold;}.btn:hover { background-color: RoyalBlue;}body { background-color: #1451AE; color: #ffffff; font-size: 14px; font-weight: bold; margin: 0 0 0 0.0; overflow-y:hidden; text-shadow: 3px 2px DodgerBlue;} .main { padding: 0px 0px; position: absolute; top: 0; right: 0; bottom: 0; left: 0; overflow-y:hidden;}</style></head><body><center><h1>9.00 Payloads</h1>";
@@ -549,11 +545,6 @@ void handlePayloads() {
   webServer.send(200, "text/html", output);
 }
 
-
-void handleLoader()
-{
-  webServer.send(200, "text/html", loaderData);
-}
 
 
 void handleConfig()
@@ -687,7 +678,22 @@ void handleCacheManifest() {
     }
     entry.close();
   }
-  output += "loader.html\r\npayloads.html\r\n";
+  if(!instr(output,"index.html\r\n"))
+  {
+    output += "index.html\r\n";
+  }
+  if(!instr(output,"menu.html\r\n"))
+  {
+    output += "menu.html\r\n";
+  }
+  if(!instr(output,"loader.html\r\n"))
+  {
+    output += "loader.html\r\n";
+  }
+  if(!instr(output,"payloads.html\r\n"))
+  {
+    output += "payloads.html\r\n";
+  }
   webServer.setContentLength(output.length());
   webServer.send(200, "text/cache-manifest", output);
 }
