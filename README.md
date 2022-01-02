@@ -8,6 +8,10 @@ this is for the 9.00 exploit and the esp8266.
 
 the exploit files and payloads will be cached on first load which will allow full offline operation, you will still need to plug in the usb drive manually but the ESP8266 will not be required in offline mode.
 
+the only files now required on the spiffs storage of the esp8266 are the .bin payloads, everything else is handled internally including generating a list of payloads.
+
+you can still modify the html by uploading your own index.html, if there is no index.html on the spiffs storage the internal pages will be used.
+
 the firmware is updatable via http and the exploit files can be managed via http.
 
 you can access the main page from the userguide or the consoles webbrowser.
