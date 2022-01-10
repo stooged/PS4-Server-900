@@ -12,6 +12,8 @@ the only files now required on the spiffs storage of the esp8266 are the .bin pa
 
 you can still modify the html by uploading your own index.html, if there is no index.html on the spiffs storage the internal pages will be used.
 
+if you have problems compiling the sketch make sure the <a href=https://github.com/esp8266/Arduino>ESP8266 library</a> is up to date. 
+
 the firmware is updatable via http and the exploit files can be managed via http.
 
 you can access the main page from the userguide or the consoles webbrowser.
