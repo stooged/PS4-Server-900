@@ -34,6 +34,10 @@ function loadPayloadData() // preload payload data
         }};
         xhr.send();
   }
+  else
+  {
+     showMessage("No payload set.");
+  }
 }
 
 
