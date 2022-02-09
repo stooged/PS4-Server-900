@@ -1,8 +1,11 @@
 # PS4 Server 9.00
 
+
+<b>if you do not want to have to insert usb drives or wire things up then use <a href=https://github.com/stooged/ESP32-Server-900u>ESP32-Server-900u</a> and a ESP32-s2 board.</b>
+
+<br><br>
+
 This is a project designed for the <a href=https://www.wemos.cc/en/latest/d1/d1_mini.html>esp8266 D1 Mini</a> or the <a href=https://www.wemos.cc/en/latest/d1/d1_mini_pro.html>esp8266 D1 Mini PRO</a> to provide a wifi http server and dns server.
-
-
 
 this is for the 9.00 exploit and the esp8266.
 
