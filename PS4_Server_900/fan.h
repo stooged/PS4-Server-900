@@ -184,9 +184,6 @@ uint8_t fan[]{
 #endif
 
 
-
-
-
 /* source
 https://github.com/Scene-Collective/ps4-fan-threshold/
 
